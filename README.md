@@ -1,5 +1,5 @@
-**Read this first: what EMP is supposed to do
-**EMP is a 3D copy of a factory. A user clicks on a machine in the 3D model and attaches a test result to it. Later, someone else searches for that test result and can jump back to the exact machine.
+**Read this first: what EMP is supposed to do**
+EMP is a 3D copy of a factory. A user clicks on a machine in the 3D model and attaches a test result to it. Later, someone else searches for that test result and can jump back to the exact machine.
 So there are five things that must work perfectly:
 1.	When you click a machine, EMP knows which machine it is.
 2.	A test attached to Machine A stays on Machine A, forever.
@@ -8,8 +8,7 @@ So there are five things that must work perfectly:
 5.	A broken 3D file shows a clear message, not a crash.
 Everything in this list of tasks exists to make one of those five things work.
 
-**Words you will see in these tasks
-**
+**Words you will see in these tasks**
 Word	What it means
 Mesh	One 3D shape inside a model file. A conveyor belt is a mesh.
 Tag	A record we attach to a spot on a machine. In our code, "tag" and "record" mean the same thing.
@@ -24,8 +23,8 @@ Soft delete	Marking something as deleted instead of actually removing it, so it 
 p95	"95% of requests are faster than this." A normal way to measure speed.
 .explain()	A MongoDB command that tells you how it answered your question — whether it used an index or read everything.
 
-**How to check any speed task
-**Several tasks ask for .explain() output. Here is how:
+**How to check any speed task**
+Several tasks ask for .explain() output. Here is how:
 const result = await tagsModel.find({ /* your query */ }).explain("executionStats");
 console.log(JSON.stringify(result, null, 2));
 Look at two things in the output:
