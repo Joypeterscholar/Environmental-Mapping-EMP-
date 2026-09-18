@@ -21,7 +21,12 @@ export const addTags = async (
 	presence: string,
 	type: string,
 	group: string,
-	rest: any
+	rest: any,
+	objectRef?: {
+		objectId?: string;
+		objectPath?: string;
+		meshName?: string;
+	}
 ): Promise<any> => {
 	try {
 		const Model = await modelModel.findById(modelId);
@@ -56,9 +61,19 @@ export const addTags = async (
 			})();
 		}
 
+		// objectRef contract fields (see /docs/object-ref-contract.md) - applied
+		// to both tag types so the machine identity is never dropped depending
+		// on whether the tag is an incident or a sampling record.
+		const objectRefFields = {
+			objectId: objectRef?.objectId,
+			objectPath: objectRef?.objectPath,
+			meshName: objectRef?.meshName,
+		};
+
 		if (type === "sampling") {
 			tagData = {
 				objectName,
+				...objectRefFields,
 				evidence: evidenceUrl,
 				action,
 				sample,
@@ -78,6 +93,7 @@ export const addTags = async (
 			tagData = {
 				incident,
 				objectName,
+				...objectRefFields,
 				evidence: evidenceUrl,
 				action,
 				locations,

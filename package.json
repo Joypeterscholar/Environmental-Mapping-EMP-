@@ -4,7 +4,7 @@
     "description": "��#\u0000 \u0000E\u0000v\u0000m\u0000-\u0000T\u0000y\u0000p\u0000e\u0000S\u0000c\u0000r\u0000i\u0000p\u0000t\u0000\r\u0000 \u0000",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "jest",
         "start": "set DEBUG=false & nodemon dist/index.js",
         "dev": "set NODE_ENV=development && nodemon src/index.ts",
         "build": "tsc",
