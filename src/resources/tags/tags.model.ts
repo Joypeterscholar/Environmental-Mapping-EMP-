@@ -7,6 +7,21 @@ const TagsSchema = new Schema(
 			type: String,
 			require: true,
 		},
+		// objectRef contract fields - see /docs/object-ref-contract.md.
+		// Optional so existing clients that only send objectName keep working.
+		objectId: {
+			type: String,
+			required: false,
+			index: true,
+		},
+		objectPath: {
+			type: String,
+			required: false,
+		},
+		meshName: {
+			type: String,
+			required: false,
+		},
 		incident: {
 			type: String,
 			required: false,

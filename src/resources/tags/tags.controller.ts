@@ -25,6 +25,10 @@ export class TagController {
 			presence,
 			type,
 			group,
+			// objectRef contract fields - see /docs/object-ref-contract.md.
+			objectId,
+			objectPath,
+			meshName,
 			...rest
 		} = req.body;
 
@@ -62,7 +66,8 @@ export class TagController {
 				presence,
 				type,
 				group,
-				rest
+				rest,
+				{ objectId, objectPath, meshName }
 			);
 			res.status(200).json({
 				status: "success",
@@ -90,6 +95,9 @@ export class TagController {
 				presence,
 				type,
 				action,
+				objectId,
+				objectPath,
+				meshName,
 			} = req.body;
 			const files = req.files;
 			let imageFile: Express.Multer.File | null = null;
@@ -109,6 +117,9 @@ export class TagController {
 			const tag = await tagModel.findByIdAndUpdate(id, {
 				incident,
 				objectName,
+				objectId,
+				objectPath,
+				meshName,
 				fileName,
 				frequency,
 				locations,
