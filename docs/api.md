@@ -602,21 +602,91 @@ just the raw saved document. This endpoint predates the standard shape.
 The issue that requested this doc (`Write down what our API sends and
 receives`, #2) asks for two new endpoints to be documented here ahead of
 implementation, so the frontend can build against them at the same time.
-Neither has been scoped yet - both are placeholders to be filled in once
-their tasks start. Do not build against either of these until this section
-has real content.
+Both are now scoped as tickets (BE-09, BE-10, replacing the earlier
+`T-BE09`/`T-BE10` placeholders) - but **neither is implemented yet**.
+Everything below is the ticket's spec, not something read from code like the
+rest of this document. Do not build against either of these until the
+ticket ships and this note is removed.
 
-### T-BE09
+### BE-09 - `GET /tag/by-object` (not yet built)
 
-**TODO** - method, path, params, and response shape not yet defined.
+*P0 - Phase 2 - 1 day - needs BE-01, BE-07*
 
-### T-BE10
+**Why**: this is the "click machine → see its test records" direction. The
+frontend cannot build it without this.
 
-**TODO** - method, path, params, and response shape not yet defined.
+**What it does**: returns the tag/records for one machine (`modelId` +
+`objectId`), newest first, paged. Must respect the caller's role and allowed
+locations, the same way `all-tags`/`paginated-tags` do.
 
-One concrete candidate worth confirming as T-BE09 once it's scoped: the
-frontend's `object-ref-contract.md` acceptance criteria references a
+**Query params**:
+
+| Param | Required | Notes |
+|---|---|---|
+| `modelId` | yes | which model the machine belongs to |
+| `objectId` | yes | identifies the machine - objectRef contract, see `/docs/object-ref-contract.md` |
+| `page` | no | 1-indexed |
+| `limit` | no | page size |
+
+**Response shape**: not pinned down beyond "records for that machine, newest
+first, with paging" - the existing `paginated-tags` envelope
+(`{ status, data: { items, total, page, limit }, message }`, sorted by
+`createdAt` descending) is the obvious model to reuse for consistency.
+
+Note: today's `Tag` schema (`tags.model.ts`) has no `objectId` field or
+index at all - `objectId` currently only exists as a copy inside the
+`taggedInfo` JSON blob (see `POST /tag/add` above). The acceptance criteria
+below (`.explain()` using an `objectRef.objectId` index) implies a real
+schema/index change, which is presumably what BE-01/BE-07 provide.
+
+**How we know it's done** (from the ticket):
+- [ ] Returns every record for the planted test machine, and nothing
+      belonging to a nearby machine with a similar name - i.e. must match on
+      `objectId`, never on `objectName`
+- [ ] Works correctly when one machine has 1,000 records
+- [ ] `.explain()` shows it uses the `objectRef.objectId` index
+- [ ] A machine with no records returns an empty list with status `200` -
+      not `404`
+
+### BE-10 - `GET /tag/:id/locate` (not yet built)
+
+*P0 - Phase 2 - half a day - needs BE-01*
+
+**Why**: this is the "open a test record → jump to that machine in 3D"
+direction. It does not exist at all today.
+
+**What it does**: given a tag/record id, returns everything the 3D viewer
+needs in one response, so it doesn't have to make a second call:
+
+```jsonc
+{
+  "modelId": "...",
+  "modelFile": "...",
+  "modelName": "...",
+  "taggingReliability": "...",
+  "objectRef": { /* objectId / objectPath / meshName - objectRef contract */ }
+}
+```
+
+Note: `modelFile`, `taggingReliability`, and `objectRef` are not fields on
+the current `Tag` or `Model` schemas (`tags.model.ts`, `model.model.ts` has
+`file`/`modelName` but nothing named `modelFile` or `taggingReliability`) -
+this endpoint depends on BE-01 to introduce them.
+
+**How we know it's done** (from the ticket):
+- [ ] The frontend can load the model, move the camera to the saved
+      position, and highlight the machine using only this one response
+- [ ] If the model was permanently deleted, return `404` with a clear
+      message saying so
+- [ ] Respects role and location permissions
+- [ ] Written here in `/docs/api.md` before the frontend starts their FE-06
+      (tracked by this section itself - keep it current as the ticket lands)
+
+---
+
+Separately, and not resolved by either ticket above: the frontend's
+`object-ref-contract.md` acceptance criteria references a
 `GET /model/:id/objects` endpoint (a canonical per-model list of machines
 with their server-computed `objectId`/`objectPath`, used to verify the
 frontend's client-side calculation matches the backend's) - no such route
-exists in `model.routes.ts` today.
+exists in `model.routes.ts` today, and neither BE-09 nor BE-10 adds it.
